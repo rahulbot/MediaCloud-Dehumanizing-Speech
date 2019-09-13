@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1 ">
+        <h2>Check a Newspaper</h2>
+
+      <div class="form-group">
+        <input class="form-control" id="mediaSourceAutoComplete" name="searchStr" type="text" autocomplete="off" placeholder="Search by name or url">
+      </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10 offset-md-1 ">
+        <div id="attentionChart" style="width:100%; height:300px;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+function splitStoryCountToData(counts) {
+    var results = [];
+    for(var i=0;i<counts.length;i++) {
+        var item = counts[i];
+        results.push([item.timestamp*1000, item.count]);
+    }
+    return results;
+}
+function handleContent(results){
+    $('#attentionChart').html('');
+    // clean up data
+    series = [{
+      type: 'line',
+      name: 'stories w/dehumanizing speech',
+      data: splitStoryCountToData(results.attention.denigrating)
+    },{
+      type: 'line',
+      name: 'stories about immigration',
+      data: splitStoryCountToData(results.attention.immigration)
+    },{
+      type: 'line',
+      name: 'total stories',
+      visible: false,
+      data: splitStoryCountToData(results.attention.total)
+    }];
+    // console.log(series);
+    // render it  all
+    var myChart = Highcharts.chart('attentionChart', {
+        chart: {
+            type: 'spline',
+            zoomType: 'x'
+        },
+        title: {
+            text: 'Dehumanizing Speech in '+results.media.name
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        yAxis: {
+            title: {
+                text: 'stories per week'
+            }
+        },
+        series: series
+    });
+}
+
+function handleMediaSourceSelected(media) {
+  $('#attentionChart').html('<div style="text-align:center;"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>');
+  $.ajax({
+    url: "/api/stories/counts.json",
+    data: { mediaId: media.media_id },
+    success: handleContent,
+  })
+}
+
+var options = {
+  url: "/api/media/search.json",
+  preparePostData: function(data) {
+    data.searchStr = $("#mediaSourceAutoComplete").val();
+    // console.log(data);
+    return data;
+  },
+  ajaxSettings: {
+    dataType: "json",
+    method: "POST",
+    data: {
+      dataType: "json"
+    }
+  },
+  getValue: "name",
+  requestDelay: 400,
+  list: {
+    match: {
+	  enabled: true
+    },
+    onClickEvent: function(arg) {
+      var selected = $("#mediaSourceAutoComplete").getSelectedItemData();
+      handleMediaSourceSelected(selected);
+    }
+  }
+};
+$(function() {
+  $("#mediaSourceAutoComplete").easyAutocomplete(options);
+});
+{% endblock %}

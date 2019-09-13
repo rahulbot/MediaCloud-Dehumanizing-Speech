@@ -1,0 +1,5 @@
+requests>=2.20.0
+flask==1.0.3
+gunicorn==19.9.0
+python-dotenv==0.10.3
+mediacloud==3.6.5

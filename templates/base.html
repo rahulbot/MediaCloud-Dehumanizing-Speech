@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/styles/app.css" type="text/css" charset="utf-8" />
+    <link rel="stylesheet" href="/static/styles/easy-autocomplete.min.css">
+
+    <title>Dehumanizing Speech</title>
+  </head>
+  <body>
+    
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron">
+            <h1 class="display-4">Dehumanizing Speech</h1>
+            <p class="lead">
+              Hate speech is on the rise. Explore how much the newspaper you read uses it.
+            </p>
+            <hr class="my-4">
+            <p>
+              <a href="https://mediacloud.org">Media Cloud</a> and <a href="https://defineamerican.com/">Define American</a> worked together to create a new report on this trend. The report, <a href="https://defineamerican.com/journalismreport/">The Language of Immigration Reporting: Normalizing vs. Watchdogging in a Nativist Age</a>, uses Media Cloud to look at increases in dehumanizing speech about immigrants in U.S. media.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {% block content %}
+        {{ content |safe }}
+      {% endblock %}
+
+      <div class="row">
+        <div class="col-12">
+          <hr />
+          <h2>Read the Full Report</h2>
+            <div class="jumbotron">
+            <h1 class="display-4">Dehumanizing Speech</h1>
+            <p class="lead">
+              Hate speech is on the rise. Explore how much the newspaper you read uses it.
+            </p>
+            <hr class="my-4">
+            <p>
+              <a href="https://mediacloud.org">Media Cloud</a> and <a href="https://defineamerican.com/">Define American</a> worked together to create a new report on this trend. The report, <a href="https://defineamerican.com/journalismreport/">The Language of Immigration Reporting: Normalizing vs. Watchdogging in a Nativist Age</a>, uses Media Cloud to look at increases in dehumanizing speech about immigrants in U.S. media.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="/static/scripts/jquery.easy-autocomplete.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script>
+    {% block page_scripts %}{% endblock %}
+      {% if matomo_site_id %}
+        var _paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+          var u="//{{ matomo_host }}/";
+          _paq.push(['setTrackerUrl', u+'matomo.php']);
+          _paq.push(['setSiteId', {{ matomo_site_id }}]);
+          var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+          g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        })();
+      {% endif %}
+  </script>
+
+</html>
