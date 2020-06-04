@@ -20,8 +20,10 @@ MAX_SOURCE_MATCHES = 20
 mc = mediacloud.api.MediaCloud(os.getenv('MC_API_KEY'))
 
 SPEECH_QUERY = '"illegal immigrant" OR "illegal immigrants" OR "illegal alien" OR "illegal aliens" OR illegals OR "chain migration" OR "anchor baby" OR "anchor babies" OR "criminal alien" OR "criminal aliens" OR "flood immigrants"~10 OR "flood migrants"~10 OR "surge immigrants"~10 OR "surge migrants"~10 OR "wave immigrants"~10 OR "wave migrants"~10 OR "immigrant invasion"~10 OR "immigrants invading"~10 OR  "migrant invasion"~10 OR "migrants invading"~10 OR "catch and release"';
-IMMIGRATION_QUERY = 'immigra*';
+IMMIGRATION_QUERY = 'immigra*'
 DATE_QUERY = 'publish_day:[2017-01-20T00:00:00Z TO 2019-09-01T00:00:00Z]';
+DATE_QUERY_2014 = 'publish_day:[2014-01-01T00:00:00Z TO 2015-01-01T00:00:00Z]';
+DATE_QUERY_2018 = 'publish_day:[2018-01-01T00:00:00Z TO 2019-01-01T00:00:00Z]';
 
 SECONDS_IN_A_DAY = 86400
 
@@ -36,13 +38,36 @@ def index():
 @app.route("/api/media/search.json", methods=['POST'])
 def media_search():
     search_str = request.form.get('searchStr')
-    if len(search_str) < 3: # don't search for short strings
+    if len(search_str) < 3:  # don't search for short strings
         matching_sources = []
     else:
         # TODO: limit this to english language sources?
         matching_sources = mc.mediaList(name_like=search_str, rows=MAX_SOURCE_MATCHES, sort="num_stories")
         matching_sources = [{'media_id': m['media_id'], 'name': m['name']} for m in matching_sources]
     return jsonify(matching_sources)
+
+
+def _difference(query):
+    fourteen = mc.storyCount(query, DATE_QUERY_2014)['count']
+    eighteen = mc.storyCount(query, DATE_QUERY_2018)['count']
+    delta = float(eighteen) / float(fourteen)
+    return {
+        'stories-2014': fourteen,
+        'stories-2018': eighteen,
+        'increase': delta,
+    }
+
+
+@app.route("/api/stories/change.json")
+def story_change():
+    media_id = request.args.get('mediaId')
+    results = {
+        'increase': {
+            'denigrating': _difference("(" + SPEECH_QUERY + ") AND (media_id:" + media_id + ")"),
+            'immigration': _difference("(" + IMMIGRATION_QUERY + ") AND (media_id:" + media_id + ")"),
+        }
+    }
+    return jsonify(results)
 
 
 @app.route("/api/stories/counts.json")
